@@ -11,6 +11,8 @@
       }
       .wrap {width: 100%}
       .menu {position: relative; height: 100px}
+      .menu .setting {display: none}
+      .menu input {text-align: center}
       .container {position: relative; display: none}
       .container img {width: 100%}
       #clipImg {position: fixed; left: 0; top: 100px;}
@@ -77,7 +79,7 @@
     let $titleCon = $('.titleCon')
 
 	  $container.show()
-    $menu.show()
+    $menu.find('.setting').show()
 
 	  $container.width($bgImg.width())
 	  $container.height($bgImg.height())
