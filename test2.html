@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ko">
+    <head>
+        <meta charset="UTF-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>화면 png 파일로 다운로드 하기</title>
+
+        <script src="https://html2canvas.hertzen.com/dist/html2canvas.min.js"></script>
+
+        <style>
+            #capture {
+                position: absolute;
+                left: -200px;
+                top: 100px;
+                width: 1200px; 
+                padding: 10px;
+                background: #f5da55;
+            }
+
+            #download-btn {
+                margin-top: 1rem;
+            }
+        </style>
+    </head>
+    <body>
+        <!-- 이미지로 만들영역 -->
+        <div id="test" style="position: absolute; left: 300px; width: 300px; height: 399px; border: 1px solid red">
+        <div id="capture">
+            <h4>캡쳐 테스트</h4>
+            <p>
+                Lorem, ipsum dolor sit amet consectetur adipisicing elit. Blanditiis ratione, animi iste, nam laborum praesentium repellat necessitatibus iusto voluptatum hic vitae possimus, ad dolore
+                deserunt ea laboriosam quibusdam. Suscipit facilis adipisci cum earum nam iure dolorem doloremque rem provident? Corrupti, nemo necessitatibus. Molestias vitae aliquam repellendus
+                dicta minima doloribus excepturi praesentium odio, mollitia quod rem nisi, sequi ducimus ab pariatur quos! Pariatur quisquam fugiat repellat itaque praesentium recusandae quis cumque
+                quasi quaerat, error culpa distinctio illum molestias aliquid nobis fugit et aperiam corporis soluta! Omnis aliquam quibusdam, expedita porro animi adipisci odit dignissimos ipsa
+                veritatis. Deserunt tenetur debitis eveniet excepturi!
+            </p>
+        </div>
+        </div>
+        
+        <button id="download-btn">다운로드</button>
+
+        <script>
+            const getScreenshotOfElement = async (element) => {
+                const canvas = await html2canvas(element);
+
+                return canvas;
+            };
+
+            const download = (canvas, filename) => {
+                const link = document.createElement('a');
+
+                link.download = filename;
+                link.href = canvas.toDataURL();
+                link.click();
+            };
+
+            document.querySelector('#download-btn').addEventListener('click', async () => {
+                const target = document.querySelector('#test');
+                const canvas = await getScreenshotOfElement(target);
+
+                download(canvas, 'screenshot.png');
+            });
+        </script>
+    </body>
+</html>

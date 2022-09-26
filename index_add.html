@@ -1,0 +1,174 @@
+<html>
+<head>
+    <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+    <script src="http://code.jquery.com/jquery.min.js"></script>
+    <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+    <script src="./siv/libs/html2canvas.js"></script>
+    <style type="text/css">
+      *{
+          margin:0;
+          padding:0;
+      }
+      .wrap {width: 100%}
+      .menu {position: relative; height: 100px}
+      .container {position: relative; display: none}
+      .container img {width: 100%}
+      #clipImg {position: fixed; left: 0; top: 100px;}
+      #bgImg {position: absolute; opacity: 0.4}
+      #rect {position: absolute; left: 0; top: 0; width: 375px; height: 574px}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="menu">
+      <div><input type="file" id="image" accept="image/*" onchange="addImage(event);"></div>
+      <div class="setting">
+        <button class="type">type1</button>
+        <button class="type">type2</button>
+        <button class="type">type3</button>
+        width: <input class="inputW" type="text" disabled>px, height: <input class="inputH" type="text" disabled>px
+        <div class="title">text1: <input type="text" class="title1"> text2: <input type="text" class="title2"> text3: <input type="text" class="title3"></div>
+        <button onclick="downImg()">download</button>
+      </div>
+    </div>
+    <div class="container">
+      <div id="rect">
+        <div class="titleCon" style="position: fixed">
+          <p class="title title1"></p>
+          <p class="title title2"></p>
+          <p class="title title3"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script>
+  const MENU_HEIGHT = 100
+  const RECT_WIDTH = [750, 600, 900]
+  const RECT_HEIGHT = [1148, 1000, 1200]
+
+	function addImage(event) {
+		clear()
+
+		let fileReader = new FileReader();
+		fileReader.readAsDataURL(event.target.files[0]);
+		fileReader.onload = function(e) {
+			$('.container').prepend($(`<img id="bgImg" src="${e.target.result}">`))
+			$('#rect').prepend($(`<img id="clipImg" src="${e.target.result}">`))
+
+      setTimeout(() => {
+	      init()
+      }, 1)
+		}
+	}
+
+	function clear () {
+		$(window).off('scroll')
+  }
+
+  function init() {
+		let $container = $('.container')
+    let $menu = $('.menu')
+	  let $titleInput = $menu.find('.title input')
+    let $clipImg = $('#clipImg')
+    let $bgImg = $('#bgImg')
+    let $rect = $('#rect')
+    let $sizeType = $('button.type')
+    let $titleCon = $('.titleCon')
+
+	  $container.show()
+    $menu.show()
+
+	  $container.width($bgImg.width())
+	  $container.height($bgImg.height())
+	  $clipImg.width($bgImg.width())
+	  $clipImg.height($bgImg.height())
+
+    // size button
+    $sizeType.on('click', function (e) {
+			let idx = $(e.target).index()
+	    $('.inputW').val(RECT_WIDTH[idx])
+	    $('.inputH').val(RECT_HEIGHT[idx])
+
+	    $rect.width(RECT_WIDTH[idx] / 2)
+	    $rect.height(RECT_HEIGHT[idx] / 2)
+      move()
+    }).eq(0).trigger('click')
+
+	  $titleInput.on('keyup', function (e) {
+			let idx = $(e.target).index()
+      let value = $(e.target).val()
+      $titleCon.find('.title').eq(idx).text(value)
+			if (idx === 0) {
+
+			} else if (idx === 1) {
+
+      } else {
+
+      }
+    })
+
+    $(window).on('scroll', function (e) {
+			$clipImg.css('margin-top', -1 * e.currentTarget.scrollY)
+      $titleCon.css('margin-top', -1 * e.currentTarget.scrollY)
+    })
+
+    // bg
+	  $('#bgImg').resizable({
+		  aspectRatio: $('#bgImg').width() / $('#bgImg').height(),
+		  resize: function () {
+			  $('#clipImg').width($('#bgImg').width())
+			  $('#clipImg').height($('#bgImg').height())
+		  },
+		  minWidth: $('#rect').width(),
+		  minHeight: $('#rect').height()
+	  })
+
+	  $('#rect').draggable({
+		  containment: '#clipImg',
+		  drag: function () {
+			  move()
+			  $('#bgImg').resizable({
+				  minWidth: $('#rect').position().left + $('#rect').width(),
+				  minHeight: $('#rect').position().top + $('#rect').height()
+			  })
+      }
+	  })
+
+	  function move (e) {
+		  let $rect = $('#rect')
+		  let cx = $rect.offset().left
+		  let cy = $rect.offset().top - MENU_HEIGHT
+		  let cw = $rect.width()
+		  let ch = $rect.height()
+		  $('#clipImg').css('clip', `rect(${cy}px, ${cx + cw}px, ${cy + ch}px, ${cx}px)`)
+	  }
+
+	  setTimeout(move, 1)
+  }
+
+  function downImg(){
+	  let element = document.querySelector('#rect')
+	  html2canvas(element, {
+		  scrollX: 0,
+		  scrollY: -window.scrollY,
+		  windowWidth: document.documentElement.offsetWidth,
+		  windowHeight: document.documentElement.offsetHeight,
+	  }).then(function(canvas){
+		  let clipImg = canvas.toDataURL()
+		  clipImg.crossorigin = "anonymous"
+
+		  downloadURI(clipImg, element.id + '.png')
+	  })
+  }
+
+  function downloadURI(dataUrl, name){
+	  let link = document.createElement("a")
+	  link.download = name
+	  link.href = dataUrl
+	  document.body.appendChild(link)
+	  link.click()
+  }
+</script>
+</body>
+</html>

@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+
+  <title>localhost</title>
+
+  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
+  <meta name="description" content="">
+
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+
+  <style type="text/css">
+      *{
+          margin:0;
+          padding:0;
+      }
+      body{
+          background:#FFF;
+      }
+      span{
+          width:677px;
+          height:300px;
+      }
+      img,
+      span{
+          position:absolute;
+          left:0;
+          top:0;
+      }
+      span{
+          background:url(http://www.psyonline.kr/blog/images/sample/nsp02.jpg) no-repeat;
+          opacity:0.1;
+          /*filter:alpha(opacity=10);*/
+      }
+  </style>
+
+  <script type="text/javascript">
+		window.onload=function(){
+			var img=document.getElementsByTagName('img')[0];
+			img.style.cursor='move';
+			img.style.clip='rect(148px 467px 248px 367px)';
+			img.parentNode.insertBefore(document.createElement('span'),img);
+			img.onmousedown=function(e){
+				if(!e) e=window.event;
+				this.sc=[e.clientX,e.clientY];
+				this.clip=this.style.clip.match(/([0-9]+)px,? ([0-9]+)px,? ([0-9]+)px,? ([0-9]+)px/).splice(1,4);
+				document.onmousemove=function(e){
+					if(!e) e=window.event;
+					var cx=img.clip[3]-(img.sc[0]-e.clientX);
+					var cy=img.clip[0]-(img.sc[1]-e.clientY);
+					cx=(cx<0)? 0 : ((cx+100)>677)? 577 : cx;
+					cy=(cy<0)? 0 : ((cy+100)>300)? 200 : cy;
+					img.style.clip='rect('+cy+'px '+(cx+100)+'px '+(cy+100)+'px '+cx+'px)';
+					return false;
+				}
+				document.onmouseup=function(){
+					document.onmousemove=null;
+				}
+				return false;
+			}
+		}
+  </script>
+</head>
+<body>
+
+<img src="http://www.psyonline.kr/blog/images/sample/nsp02.jpg" alt="" />
+
+</body>
+</html>

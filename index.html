@@ -1,17 +1,101 @@
-<!DOCTYPE html>
-<html lang="ko">
+<html>
 <head>
-  <meta charset="UTF-8">
-
-  <title>localhost</title>
-
-  <meta name="viewport" content="width=device-width,initial-scale=1.0,user-scalable=no">
-  <meta name="description" content="">
-
-  <style>
+  <link rel="stylesheet" href="http://code.jquery.com/ui/1.11.4/themes/smoothness/jquery-ui.css">
+  <script src="http://code.jquery.com/jquery.min.js"></script>
+  <script src="http://code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
+  <script src="./siv/libs/html2canvas.js"></script>
+  <style type="text/css">
+      *{
+          margin:0;
+          padding:0;
+      }
+      #bgImg {position: fixed; top: 0; left: 0; opacity: 0.4}
+      .container {background-color: #000;}
+      #clipImg {
+          position: fixed; top: 0px; left: 0px;
+          /* cursor: move; */
+          /* clip: rect(top, right, bottom, left) */
+      }
+      #rect {top: 0; width: 100px; height: 100px}
   </style>
 </head>
-
 <body>
+<div class="container">
+  <img id="bgImg" src="./siv/image/bg/D_Brand_06_STUDIO TOMBOY.png">
+  <div id="rect">
+    <img id="clipImg" src="./siv/image/bg/D_Brand_06_STUDIO TOMBOY.png">
+  </div>
+</div>
+<div class="menu">
+  <button onclick="downImg()">download</button>
+</div>
+
+<script>
+	$( document ).ready(function() {
+		let $container = $('.container')
+
+		$container.width($('#clipImg').width())
+		$container.height($('#clipImg').height())
+
+		$('#rect').resizable({
+			containment: '#clipImg',
+			resize: function () {
+				move()
+				$('#bgImg').resizable({
+					minWidth: $('#rect').width(),
+					minHeight: $('#rect').height(),
+				})
+			}
+		}).draggable({
+			containment: '#clipImg',
+			drag: move
+		})
+
+		$('#bgImg').resizable({
+			containment: '.container',
+			aspectRatio: $('#bgImg').width() / $('#bgImg').height(),
+			resize: function () {
+				$('#clipImg').width($('#bgImg').width())
+				$('#clipImg').height($('#bgImg').height())
+			},
+			minWidth: $('#rect').width(),
+			minHeight: $('#rect').height()
+		})
+
+		move()
+	});
+
+	function move (e) {
+		let $rect = $('#rect')
+		let cx = $rect.offset().left
+		let cy = $rect.offset().top
+		let cw = $rect.width()
+		let ch = $rect.height()
+		$('#clipImg').css('clip', `rect(${cy}px, ${cx + cw}px, ${cy + ch}px, ${cx}px)`)
+	}
+
+	function downImg(){
+		let element = document.querySelector('#rect')
+		html2canvas(element, {
+			scrollX: 0,
+			scrollY: -window.scrollY,
+			windowWidth: document.documentElement.offsetWidth,
+			windowHeight: document.documentElement.offsetHeight,
+		}).then(function(canvas){
+			let clipImg = canvas.toDataURL()
+			clipImg.crossorigin = "anonymous"
+
+			downloadURI(clipImg, element.id + '.png')
+		})
+	}
+
+	function downloadURI(dataUrl, name){
+		let link = document.createElement("a")
+		link.download = name
+		link.href = dataUrl
+		document.body.appendChild(link)
+		link.click()
+	}
+</script>
 </body>
 </html>
